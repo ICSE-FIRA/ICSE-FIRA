@@ -69,7 +69,11 @@ class TransModel(nn.Module):
         tar_output = torch.log(tar_output.clamp(min=1e-10, max=1)) 
 
         pads = torch.zeros(tar_label.size(0),1) 
-        label = torch.cat([tar_label, pads.cuda(sou.device)], dim=-1)
+        if torch.cuda.is_available():
+            label = torch.cat([tar_label, pads.cuda(sou.device)], dim=-1)
+        else:
+            label = torch.cat([tar_label, pads], dim=-1)
+
         label = label[:,1:]
         label = label.long()
         mask = label != 0

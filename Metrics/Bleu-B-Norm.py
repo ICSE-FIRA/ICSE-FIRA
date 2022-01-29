@@ -170,8 +170,7 @@ def bleuFromMaps(m1, m2):
 
 if __name__ == '__main__':
 
-  model_name = sys.argv[1]
-  ref_sentence_lst = [x.strip() for x in open(sys.argv[2]) if x.strip()]
+  ref_sentence_lst = [x.strip() for x in open(sys.argv[1]) if x.strip()]
   
   with open("tmp_ref.txt","w") as f:
     for idx, ref_sentence in enumerate(ref_sentence_lst):

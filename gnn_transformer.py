@@ -1,3 +1,4 @@
+from xmlrpc.client import FastParser
 import torch.nn as nn
 import torch.nn.functional as F
 import math
@@ -106,7 +107,11 @@ class Decoder(nn.Module):
 
     def forward(self, output_token, input_em, sou_mask, tar_mask_pad):
         # input: batch * len 
-        output_em = self.embedding(output_token) + self.pos_encode.cuda(output_token.device)
+        if torch.cuda.is_available():
+            output_em = self.embedding(output_token) + self.pos_encode.cuda(output_token.device)
+        else:
+            output_em = self.embedding(output_token) + self.pos_encode
+
         # batch * len * emdbedding
         self.tar_mask_pos = self.tar_mask_pos.to(output_token.device)
         tar_mask = torch.logical_and(tar_mask_pad.unsqueeze(1).unsqueeze(1), self.tar_mask_pos.unsqueeze(0).unsqueeze(0))

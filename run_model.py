@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 import numpy as np
@@ -16,10 +16,13 @@ import sys
 from Model import TransModel
 from Dataset import TransDataset
 
+
 use_cuda = torch.cuda.is_available()
 
-device_ids = list(range(torch.cuda.device_count()))
 smooth_func = bleu_score.SmoothingFunction().method2
+
+if use_cuda:
+    device_ids = list(range(torch.cuda.device_count()))
 
 class DotDict(dict):
     def __getattr__(self, attr):
@@ -34,7 +37,7 @@ args = DotDict({
     'dropout_rate':0.1,
     'num_head':8,
     'embedding_dim':256, 
-    'batch_size':  170 * len(device_ids), 
+    'batch_size':  170 * len(device_ids) if use_cuda else 170, 
     'test_batch_size': 20,
     'epoches':150,
     'beam_size':3,
@@ -185,7 +188,7 @@ def test(model, test_loader):
     test_index = all_index['test']
     
     model.eval()
-    f = open("OUTPUT/test_output",'w')
+    f = open("OUTPUT/output_fira",'w')
     bleus = 0
     total_data = 0
 
@@ -365,7 +368,8 @@ def test(model, test_loader):
                 for j in range(len(each_sen_split_new)):
                     if each_sen_split_new[j] in cur_r_var_map:
                         each_sen_split_new[j] = cur_r_var_map[each_sen_split_new[j]]
-                f.write(' '.join(each_sen_split_new) + ',' + str(each_bleu) + '\n')
+
+                f.write(' '.join(each_sen_split_new) + '\n')
             f.flush()
             total_data += len(batch[0])
             print("data: %d/%d bleu: %f"%(total_data, len(test_loader.dataset), bleus_batch / len(batch[0])))
@@ -374,7 +378,6 @@ def test(model, test_loader):
     f.close()
     bleus /= len(test_loader.dataset)
     print("early over / all batch: %d / %d"%(all_over_num, len(test_loader)))
-    return bleus
     
 def main_train():
     train_set = TransDataset(args, 'train')
@@ -403,20 +406,13 @@ def main_test():
     test_loader = DataLoader(dataset=test_set, batch_size=args.test_batch_size)
     
     model = TransModel(args)
-    model.load_state_dict(torch.load("best_model.pt"))
     if use_cuda:
+        model.load_state_dict(torch.load("best_model.pt"))
         model = model.cuda(device_ids[0])
-    
-    
-    f = open('OUTPUT/test_process','w')
-    dev_bleu, output_str= dev(model, dev_loader, -1)
-    open("OUTPUT/dev_output_test",'w').write(output_str)
-    f.write('dev score: {}\n'.format(dev_bleu))
-    print("dev_score", dev_bleu)
-
-    test_bleu = test(model, test_loader)
-    f.write('test score: {}'.format(test_bleu))
-    print("test bleu: {}".format(test_bleu))
+    else:
+        device = torch.device('cpu')
+        model.load_state_dict(torch.load("best_model.pt", map_location=device))     
+    test(model, test_loader)
 
 if __name__ == '__main__':
     stage = str(sys.argv[1])
