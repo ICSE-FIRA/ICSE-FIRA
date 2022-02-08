@@ -10,12 +10,12 @@ FIRA is a learning-based commit message generation approach, which first represe
 + Sacrebleu == 1.5.1
 + Sumeval == 0.2.2
 
-## 2 Preprocess
+## 2 Obtain AST, edit operation and edge
 
-The folder `Preprocess` contains the scrips to preprocess data to get **abstrat syntax tree (AST)**, **edit operation** and **edge**. You can enter the directory `./Preprocess`  
+The folder `GetAstEditEdge` contains the scrips to  get **abstrat syntax tree (AST)**, **edit operation** and **edge**. You can enter the directory `./GetAstEditEdge`  
 
 ```shell
-cd ./Preprocess
+cd ./GetAstEditEdge
 ```
 
 and run
@@ -23,32 +23,37 @@ and run
 ```
 python run_total_process_data.py num_processes num_tasks
 ```
-to preprocess the data and run 
+to get the data and run 
 ```
 python gather_data.py
 ```
-to gather the data and the final **AST**, **edit operation** and **edge** will be put in the folder `DataSet`. We use `subprocess` module of `python` to preprocess parallelly. The arguments `num_processes` and `num_tasks` are the number of parallel subprocesses and the number of tasks one subprocess executes. The two arguments should be set according to the capacity of the CPU.
+to gather the data and the final **AST**, **edit operation** and **edge** will be put in the folder `DataSet/input_2`. We use `subprocess` module of `python` to preprocess parallelly. The arguments `num_processes` and `num_tasks` are the number of parallel subprocesses and the number of tasks one subprocess executes. The two arguments should be set according to the capacity of the CPU.
 ## 3 Dataset
 
-The folder `DataSet` contains all the data which was already preprocessed, and can be directly used to train or evaluate the model. The descripstion of each file is as follows.
+The folder `DataSet` contains all the data which can be directly used to train or evaluate the model. The structure of `DataSet` is as follows.
 
-The following files are the original files of the [benchmark](https://github.com/SoftWiser-group/CoDiSum/blob/master/data4CopynetV3.zip), which is well established by Xu et al. [1].
++ **input_1**: the following files are the original files of the [benchmark](https://github.com/SoftWiser-group/CoDiSum/blob/master/data4CopynetV3.zip), which is well established by Xu et al. [1].
 
-+ difftoken.json: tokens of code changes
-+ diffmark.json: marks indicating each token is added, deleted or unchanged 
-+ diffatt.json: sub-tokens of each token
-+ variable.json: mapping between placeholders and identifiers
-+ msg.json: tokens of commit messages
-+ word_vocab.json: vocabulary of code changes and commit messages
+  + difftoken.json: tokens of code changes
+  + diffmark.json: marks indicating each token is added, deleted or unchanged 
+  + diffatt.json: sub-tokens of each token
+  + variable.json: mapping between placeholders and identifiers
+  + msg.json: tokens of commit messages
+  + word_vocab.json: vocabulary of code changes and commit messages
 
-The following files are got by our preprocessing scrips, which is already introduced in  section **Preprocess**.
-
++ **input_2**: the following files are got by running the scrips in the folder `GetAstEditEdge`, and the steps to get them are already introduced in  section **Obtain AST, edit operation and edge**.
 + ast.json: abstrat syntax trees of code changes
+  
 + change.json: edit operations between old code and new code
+  
 + ast_change_vocab.json: vocabulary of AST and edit operations
+  
 + edge_ast.json: edges of AST
+  
 + edge_ast_code.json: edges between AST and tokens of code changes 
+  
 + edge_change_ast.json: edges between edit operations and AST
+  
 + edge_change_code.json: edges between edit operations and tokens of code changes
 
 The files in `DataSet` will be read by **Dataset.py**, and converted to tensors and fed to the model. 
@@ -59,7 +64,7 @@ We use GNN as encoder and transformer with dual copy mechanism as decoder. We de
 ```
 python ./run_model.py train
 ```
-and the model will be saved as `best_model.pt`. Because of the size limit of files uploaded to GitHub, we put `best_model.pt`,  which is already trained,  in our [zenodo repository](https://zenodo.org/record/5915220). 
+and the model will be saved as `best_model.pt`. Due to the size limit of files uploaded to GitHub, we put `best_model.pt`,  which is already trained,  in our [zenodo repository](https://zenodo.org/record/5915220). 
 
 If you want to evaluate the model, you can run
 ```

@@ -27,23 +27,23 @@ class TransDataset(Dataset):
         
         self.graph_len = self.diff_len + self.sub_token_len + self.ast_change_len
 
-        raw_diffs = json.load(open("DataSet/difftoken.json"))
-        raw_diff_atts = json.load(open("DataSet/diffatt.json"))
-        raw_diff_marks = json.load(open("DataSet/diffmark.json"))
-        raw_msgs = json.load(open("DataSet/msg.json"))
-        var_maps = json.load(open("DataSet/variable.json"))
-        raw_changes = json.load(open('DataSet/change.json'))
-        raw_asts = json.load(open('DataSet/ast.json'))
-        raw_edge_change_codes = json.load(open('DataSet/edge_change_code.json'))
-        raw_edge_change_asts = json.load(open('DataSet/edge_change_ast.json'))
-        raw_edge_ast_codes = json.load(open('DataSet/edge_ast_code.json'))
-        raw_edge_asts = json.load(open('DataSet/edge_ast.json'))
+        raw_diffs = json.load(open("DataSet/input_1/difftoken.json"))
+        raw_diff_atts = json.load(open("DataSet/input_1/diffatt.json"))
+        raw_diff_marks = json.load(open("DataSet/input_1/diffmark.json"))
+        raw_msgs = json.load(open("DataSet/input_1/msg.json"))
+        var_maps = json.load(open("DataSet/input_1/variable.json"))
+        raw_changes = json.load(open('DataSet/input_2/change.json'))
+        raw_asts = json.load(open('DataSet/input_2/ast.json'))
+        raw_edge_change_codes = json.load(open('DataSet/input_2/edge_change_code.json'))
+        raw_edge_change_asts = json.load(open('DataSet/input_2/edge_change_ast.json'))
+        raw_edge_ast_codes = json.load(open('DataSet/input_2/edge_ast_code.json'))
+        raw_edge_asts = json.load(open('DataSet/input_2/edge_ast.json'))
 
         assert len(raw_diffs) == len(raw_diff_atts) == len(raw_diff_marks) == len(raw_msgs) == len(var_maps) == len(raw_changes) == len(raw_edge_change_codes) == len(raw_edge_change_asts) == len(raw_asts) == len(raw_edge_ast_codes) == len(raw_edge_asts)
 
-        self.vocab = json.load(open('DataSet/word_vocab.json'))
+        self.vocab = json.load(open('DataSet/input_1/word_vocab.json'))
 
-        if not os.path.exists('DataSet/ast_change_vocab.json'):
+        if not os.path.exists('DataSet/input_2/ast_change_vocab.json'):
             ast_word = {}
             THRESHOLD = 1
             for i in range(len(raw_asts)):
@@ -57,9 +57,9 @@ class TransDataset(Dataset):
             for word in ast_word:
                 if ast_word[word] >= THRESHOLD:
                     ast_change_vocab[word] = len(ast_change_vocab)
-            json.dump(ast_change_vocab, open('DataSet/ast_change_vocab.json', 'w'),indent=1)
+            json.dump(ast_change_vocab, open('DataSet/input_2/ast_change_vocab.json', 'w'),indent=1)
     
-        self.ast_change_vocab = json.load(open('DataSet/ast_change_vocab.json'))
+        self.ast_change_vocab = json.load(open('DataSet/input_2/ast_change_vocab.json'))
 
         if not os.path.exists("processed_%s.pkl"%(data_name)):
             self.process_data(raw_diffs, raw_diff_atts, raw_diff_marks, raw_msgs, var_maps, raw_changes, raw_asts, raw_edge_change_codes, raw_edge_change_asts, raw_edge_ast_codes, raw_edge_asts)

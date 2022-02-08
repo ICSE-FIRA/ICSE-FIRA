@@ -45,17 +45,17 @@ args = DotDict({
     'ast_change_vocab_size':0
 })
 
-vocab = json.load(open('DataSet/word_vocab.json'))
+vocab = json.load(open('DataSet/input_1/word_vocab.json'))
 r_vocab = {}
 for each in vocab:
     r_vocab[vocab[each]] = each
 
 args.vocab_size = len(vocab)
 
-ast_change_vocab = json.load(open('DataSet/ast_change_vocab.json'))
+ast_change_vocab = json.load(open('DataSet/input_2/ast_change_vocab.json'))
 args.ast_change_vocab_size = len(ast_change_vocab)
 
-var_maps = json.load(open("DataSet/variable.json"))
+var_maps = json.load(open("DataSet/input_1/variable.json"))
 all_index = json.load(open('all_index'))
 
 def seed_everything(seed=0):

@@ -32,7 +32,7 @@ for i in range(math.ceil(all_num / each_num)):
 
 assert len(total_change) == len(total_ast) == len(total_edge_change_code) == len(total_edge_change_ast) == len(total_edge_ast_code) == len(total_edge_ast) == all_num
 
-dataset_path = 'DataSet'
+dataset_path = 'DataSet/input_2'
 if not os.path.exists('../' + dataset_path):
     os.makedirs('../' + dataset_path)
 json.dump(total_change, open('../%s/change.json'%dataset_path, 'w'))
