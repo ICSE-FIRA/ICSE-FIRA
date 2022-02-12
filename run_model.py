@@ -39,7 +39,7 @@ args = DotDict({
     'embedding_dim':256, 
     'batch_size':  170 * len(device_ids) if use_cuda else 170, 
     'test_batch_size': 20,
-    'epoches':150,
+    'epoches':50,
     'beam_size':3,
     'vocab_size':0,
     'ast_change_vocab_size':0
